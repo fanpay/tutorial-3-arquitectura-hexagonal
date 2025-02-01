@@ -4,7 +4,7 @@ import json
 from aeroalpes.modulos.cliente.aplicacion.servicios import ServicioCliente, ServicioMetodoPago
 from aeroalpes.modulos.cliente.aplicacion.dto import ClienteDTO, MetodoPagoDTO
 #from aeroalpes.modulos.cliente.aplicacion.mapeadores import MapeadorCliente, MapeadorMetodoPago
-from aeroalpes.modulos.cliente.aplicacion.mapeadores import MapeadorCliente
+from aeroalpes.modulos.cliente.aplicacion.mapeadores import MapeadorClienteDTOJson
 from aeroalpes.seedwork.dominio.excepciones import ExcepcionDominio
 
 from flask import Response, request
@@ -18,7 +18,7 @@ def registrar_cliente():
     try:
         cliente_dict = request.json  # Recibir datos del cliente en JSON
         
-        map_cliente = MapeadorCliente()
+        map_cliente = MapeadorClienteDTOJson()
         cliente_dto = map_cliente.externo_a_dto(cliente_dict)
 
         servicio_cliente = ServicioCliente()
@@ -35,7 +35,7 @@ def obtener_cliente(id):
         servicio_cliente = ServicioCliente()
         cliente_dto = servicio_cliente.obtener_cliente_por_id(id)
 
-        map_cliente = MapeadorCliente()
+        map_cliente = MapeadorClienteDTOJson()
         return map_cliente.dto_a_externo(cliente_dto), 200  # Devolver cliente con código HTTP 200
     except ExcepcionDominio as e:
         return Response(json.dumps({'error': str(e)}), status=400, mimetype='application/json')

@@ -5,9 +5,10 @@ En este archivo usted encontrará los objetos valor del dominio de cliente
 """
 
 from aeroalpes.seedwork.dominio.objetos_valor import ObjetoValor, Ciudad
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from uuid import uuid4
 
 @dataclass(frozen=True)
 class Nombre(ObjetoValor):
@@ -41,7 +42,7 @@ class TipoMetodoPago(Enum):
 class MetodoPago(ObjetoValor):
     tipo: TipoMetodoPago
     nombre: str
-    token: str
+    token: field(default_factory=lambda: str(uuid4()))
     datos_ofuscados: str
     fecha_registro: datetime
 
@@ -52,4 +53,8 @@ class MetodoPago(ObjetoValor):
     def obtener_representacion_segura(self) -> str:
         """Devuelve una representación segura del método de pago."""
         return f"{self.tipo.value} - {self.datos_ofuscados}"
+    
+    def cambiar_nombre(self, nuevo_nombre: str):
+        """Permite cambiar el nombre del método de pago."""
+        self.nombre = nuevo_nombre
 

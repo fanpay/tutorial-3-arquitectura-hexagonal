@@ -7,7 +7,7 @@ objetos complejos del dominio de clientes
 
 from .entidades import ClienteNatural
 from .reglas import EmailUnico, NombreValido, EmailValido, CedulaValida, MetodoPagoValido
-from .excepciones import NombreInvalidoExcepcion, CorreoInvalidoExcepcion, CedulaInvalidaExcepcion, MetodoPagoInvalidoExcepcion, UsuarioExistenteExcepcion
+from .excepciones import NombreInvalidoExcepcion, EmailInvalidoExcepcion, CedulaInvalidaExcepcion, MetodoPagoInvalidoExcepcion, UsuarioExistenteExcepcion
 from aeroalpes.seedwork.dominio.fabricas import Fabrica
 from aeroalpes.seedwork.dominio.repositorios import Mapeador
 from dataclasses import dataclass
@@ -25,8 +25,8 @@ class FabricaCliente(Fabrica):
             raise NombreInvalidoExcepcion()
         
         # Validar correo
-        if not CorreoValido(obj.email.address).es_valido():
-            raise CorreoInvalidoExcepcion()
+        if not EmailValido(obj.email.address).es_valido():
+            raise EmailInvalidoExcepcion()
         
         # Validar cédula (tomar en cuenta el país)
         if not CedulaValida(obj.cedula.numero, obj.cedula.ciudad.pais).es_valido():

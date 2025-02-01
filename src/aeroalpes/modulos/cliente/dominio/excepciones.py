@@ -13,7 +13,7 @@ class NombreInvalidoExcepcion(ExcepcionFabrica):
     def __str__(self):
         return str(self.__mensaje)
 
-class CorreoInvalidoExcepcion(ExcepcionFabrica):
+class EmailInvalidoExcepcion(ExcepcionFabrica):
     def __init__(self, mensaje='El correo electrónico no cumple con el formato RFC822'):
         self.__mensaje = mensaje
     def __str__(self):

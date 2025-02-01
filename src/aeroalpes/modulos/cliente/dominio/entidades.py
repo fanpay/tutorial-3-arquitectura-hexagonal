@@ -40,7 +40,7 @@ class ClienteNatural(Usuario, AgregacionRaiz):
         """Modifica el nombre de un método de pago."""
         metodo = self.obtener_metodo_pago(token)
         if metodo:
-            metodo.nombre = nuevo_nombre
+            metodo.cambiar_nombre(nuevo_nombre)
 
 @dataclass
 class ClienteEmpresa(Usuario):
