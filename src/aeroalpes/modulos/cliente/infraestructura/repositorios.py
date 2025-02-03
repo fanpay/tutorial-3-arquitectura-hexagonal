@@ -15,8 +15,8 @@ from uuid import UUID
 
 
 class RepositorioClienteSQLite(RepositorioCliente):
-    def agregar_cliente(self, cliente: ClienteNatural) -> None:
-        session = self._get_session()
+    def agregar(self, cliente: ClienteNatural) -> None:
+        session = db.session
         cliente_dto = ClienteDTO(
             email=cliente.email.address,
             nombre=cliente.nombre.nombres,
@@ -26,8 +26,8 @@ class RepositorioClienteSQLite(RepositorioCliente):
         session.add(cliente_dto)
         session.commit()
 
-    def obtener_cliente_por_email(self, email: str) -> ClienteNatural:
-        session = self._get_session()
+    def obtener_por_id(self, email: str) -> ClienteNatural:
+        session = db.session
         cliente_dto = session.query(ClienteDTO).filter_by(email=email).first()
         if cliente_dto:
             return ClienteNatural(
@@ -38,8 +38,8 @@ class RepositorioClienteSQLite(RepositorioCliente):
             )
         return None
 
-    def actualizar_cliente(self, cliente: ClienteNatural) -> None:
-        session = self._get_session()
+    def actualizar(self, cliente: ClienteNatural) -> None:
+        session = db.session
         cliente_dto = session.query(ClienteDTO).filter_by(email=cliente.email.address).first()
         if cliente_dto:
             cliente_dto.nombre = cliente.nombre.nombres
@@ -47,17 +47,20 @@ class RepositorioClienteSQLite(RepositorioCliente):
             cliente_dto.cedula = cliente.cedula.numero
             session.commit()
 
-    def eliminar_cliente(self, cliente: ClienteNatural) -> None:
-        session = self._get_session()
+    def eliminar(self, cliente: ClienteNatural) -> None:
+        session = db.session
         cliente_dto = session.query(ClienteDTO).filter_by(email=cliente.email.address).first()
         if cliente_dto:
             session.delete(cliente_dto)
             session.commit()
-
+            
+    def obtener_todos(self, id: UUID) -> ClienteNatural:
+        # TODO
+        raise NotImplementedError
 
 class RepositorioMetodoPagoSQLite(RepositorioMetodoPago):
     def agregar_metodo_pago(self, metodo_pago: MetodoPago) -> None:
-        session = self._get_session()
+        session = db.session
         metodo_pago_dto = MetodoPagoDTO(
             token=metodo_pago.token,
             tipo=metodo_pago.tipo,
@@ -68,14 +71,14 @@ class RepositorioMetodoPagoSQLite(RepositorioMetodoPago):
         session.commit()
 
     def eliminar_metodo_pago(self, metodo_pago: MetodoPago) -> None:
-        session = self._get_session()
+        session = db.session
         metodo_pago_dto = session.query(MetodoPagoDTO).filter_by(token=metodo_pago.token).first()
         if metodo_pago_dto:
             session.delete(metodo_pago_dto)
             session.commit()
 
     def obtener_metodos_pago(self, cliente: ClienteNatural) -> list[MetodoPago]:
-        session = self._get_session()
+        session = db.session
         metodos_dto = session.query(MetodoPagoDTO).filter_by(cliente_email=cliente.email.address).all()
         return [MetodoPago(
             token=metodo.token,

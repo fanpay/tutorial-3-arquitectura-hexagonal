@@ -2,33 +2,20 @@
 
 from aeroalpes.seedwork.dominio.reglas import ReglaNegocio
 from aeroalpes.seedwork.dominio.objetos_valor import Pais
-from .objetos_valor import Email, Cedula, MetodoPago
+from .objetos_valor import Nombre, Email, Cedula, MetodoPago
 
 
 import re
-
-class EmailUnico(ReglaNegocio):
-    def __init__(self, email, cliente_repositorio, mensaje="El email ya está registrado"):
-        super().__init__(mensaje)
-        self.email = email
-        self.cliente_repositorio = cliente_repositorio
-
-    def es_valido(self) -> bool:
-        # Aquí se consulta el repositorio para verificar si ya existe un cliente con ese email
-        cliente = self.cliente_repositorio.obtener_por_email(self.email)
-        return cliente is None  # Si no existe, el email es único
         
 class NombreValido(ReglaNegocio):
-    nombre: str
-    apellidos: str
+    nombre: Nombre
 
-    def __init__(self, nombre: str, apellidos: str, mensaje='El nombre o apellido no pueden ser nulos o contener caracteres especiales'):
+    def __init__(self, nombre, mensaje='El nombre o apellido no pueden ser nulos o contener caracteres especiales'):
         super().__init__(mensaje)
         self.nombre = nombre
-        self.apellidos = apellidos
 
     def es_valido(self) -> bool:
-        return bool(self.nombre) and bool(self.apellidos) and re.match("^[A-Za-z ]+$", self.nombre) and re.match("^[A-Za-z ]+$", self.apellidos)
+        return bool(self.nombre) and bool(self.nombre.nombres) and bool(self.nombre.apellidos) and re.match("^[A-Za-z ]+$", self.nombre.nombres) and re.match("^[A-Za-z ]+$", self.nombre.apellidos)
 
 class EmailValido(ReglaNegocio):
     email: Email
@@ -52,9 +39,9 @@ class CedulaValida(ReglaNegocio):
     def es_valido(self) -> bool:
         # Formato general para cédulas (esto debe ajustarse por país)
         if self.pais.nombre == "Chile":
-            return bool(self.cedula) and re.match(r"^\d{7,8}$", self.cedula)
+            return bool(self.cedula) and bool(self.cedula.numero) and re.match(r"^\d{7,8}$", str(self.cedula.numero))
         elif self.pais.nombre == "Colombia":
-            return bool(self.cedula) and re.match(r"^\d{6,10}$", self.cedula)
+            return bool(self.cedula) and bool(self.cedula.numero) and re.match(r"^\d{6,10}$", str(self.cedula.numero))
         # Agregar más validaciones para otros países si es necesario
         return False
 

@@ -17,15 +17,23 @@ class ServicioCliente(Servicio):
     def __init__(self):
         self._fabrica_repositorio = FabricaRepositorio()
         self._fabrica_cliente = FabricaCliente()
+        
+    @property
+    def fabrica_repositorio(self):
+        return self._fabrica_repositorio
+    
+    @property
+    def fabrica_cliente(self):
+        return self._fabrica_cliente
 
     def registrar_cliente(self, cliente_dto: ClienteDTO) -> ClienteDTO:
-        cliente = self._fabrica_cliente.crear_objeto(cliente_dto, MapeadorCliente())
-        repositorio = self._fabrica_repositorio.crear_objeto(RepositorioCliente.__class__)
+        cliente: ClienteDTO = self.fabrica_cliente.crear_objeto(cliente_dto, MapeadorCliente())
+        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioCliente.__class__)
         repositorio.agregar(cliente)
         return self._fabrica_cliente.crear_objeto(cliente, MapeadorCliente())
 
     def obtener_cliente_por_id(self, id: str) -> ClienteDTO:
-        repositorio = self._fabrica_repositorio.crear_objeto(RepositorioCliente.__class__)
+        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioCliente.__class__)
         cliente = repositorio.obtener_por_id(id)
         return self._fabrica_cliente.crear_objeto(cliente, MapeadorCliente())
 
@@ -40,6 +48,12 @@ class ServicioMetodoPago(Servicio):
         cliente.agregar_metodo_pago(metodo_pago)
         repositorio.actualizar(cliente)
         return MetodoPagoDTO(tipo=metodo_pago.tipo, detalles=metodo_pago.detalles)
+
+    def modificar_metodo_pago(self, cliente_id: str, token: str, nuevo_nombre: str) -> None:
+        repositorio_cliente = self._fabrica_repositorio.crear_objeto(RepositorioCliente.__class__)
+        cliente = repositorio_cliente.obtener_por_id(cliente_id)
+        cliente.modificar_metodo_pago(token, nuevo_nombre)
+        repositorio_cliente.actualizar(cliente)
 
     def eliminar_metodo_pago(self, id_metodo: str, id_cliente: str):
         repositorio = self._fabrica_repositorio.crear_objeto(RepositorioCliente.__class__)

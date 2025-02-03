@@ -1,14 +1,11 @@
-
 import aeroalpes.seedwork.presentacion.api as api
 import json
 from aeroalpes.modulos.cliente.aplicacion.servicios import ServicioCliente, ServicioMetodoPago
 from aeroalpes.modulos.cliente.aplicacion.dto import ClienteDTO, MetodoPagoDTO
-#from aeroalpes.modulos.cliente.aplicacion.mapeadores import MapeadorCliente, MapeadorMetodoPago
 from aeroalpes.modulos.cliente.aplicacion.mapeadores import MapeadorClienteDTOJson
 from aeroalpes.seedwork.dominio.excepciones import ExcepcionDominio
 
 from flask import Response, request
-
 
 bp = api.crear_blueprint('cliente', '/cliente')
 
@@ -40,38 +37,48 @@ def obtener_cliente(id):
     except ExcepcionDominio as e:
         return Response(json.dumps({'error': str(e)}), status=400, mimetype='application/json')
 
-'''@bp.route('/metodo-pago', methods=('POST',))
+@bp.route('/metodo-pago', methods=('POST',))
 def agregar_metodo_pago():
-    """Endpoint para agregar un método de pago a un cliente."""
+    """Endpoint para agregar un método de pago."""
     try:
-        datos_metodo = request.json  # Recibir datos del método de pago en JSON
-        id_cliente = datos_metodo.get('id_cliente')
-        metodo_dict = datos_metodo.get('metodo_pago')
+        metodo_pago_dict = request.json  # Recibir datos del método de pago en JSON
+        
+        map_metodo_pago = MapeadorMetodoPagoDTOJson()
+        metodo_pago_dto = map_metodo_pago.externo_a_dto(metodo_pago_dict)
 
-        if not id_cliente or not metodo_dict:
-            raise ExcepcionDominio("Debe especificar el cliente y los detalles del método de pago.")
-
-        map_metodo = MapeadorMetodoPago()
-        metodo_dto = map_metodo.externo_a_dto(metodo_dict)
-
+        cliente_id = metodo_pago_dict.get('cliente_id')
         servicio_metodo_pago = ServicioMetodoPago()
-        metodo_agregado = servicio_metodo_pago.agregar_metodo_pago(metodo_dto, id_cliente)
+        metodo_pago_creado = servicio_metodo_pago.agregar_metodo_pago(cliente_id, metodo_pago_dto)
 
-        return map_metodo.dto_a_externo(metodo_agregado), 201  # Devolver método de pago creado con código HTTP 201
+        return map_metodo_pago.dto_a_externo(metodo_pago_creado), 201  # Devolver método de pago creado con código HTTP 201
     except ExcepcionDominio as e:
         return Response(json.dumps({'error': str(e)}), status=400, mimetype='application/json')
 
-@bp.route('/metodo-pago/<id_metodo>', methods=('DELETE',))
-def eliminar_metodo_pago(id_metodo):
-    """Endpoint para eliminar un método de pago de un cliente."""
+@bp.route('/metodo-pago/<token>', methods=('PUT',))
+def modificar_metodo_pago(token):
+    """Endpoint para modificar un método de pago."""
     try:
-        id_cliente = request.args.get('id_cliente')  # Obtener el ID del cliente desde los parámetros
-        if not id_cliente:
-            raise ExcepcionDominio("Debe especificar el ID del cliente.")
+        datos = request.json  # Recibir datos en JSON
+        nuevo_nombre = datos.get('nombre')
+        cliente_id = datos.get('cliente_id')
 
         servicio_metodo_pago = ServicioMetodoPago()
-        servicio_metodo_pago.eliminar_metodo_pago(id_metodo, id_cliente)
+        servicio_metodo_pago.modificar_metodo_pago(cliente_id, token, nuevo_nombre)
 
-        return Response(json.dumps({'message': 'Método de pago eliminado con éxito'}), status=200, mimetype='application/json')
+        return Response(status=204)  # Devolver código HTTP 204 No Content
     except ExcepcionDominio as e:
-        return Response(json.dumps({'error': str(e)}), status=400, mimetype='application/json') '''
+        return Response(json.dumps({'error': str(e)}), status=400, mimetype='application/json')
+
+@bp.route('/metodo-pago/<token>', methods=('DELETE',))
+def eliminar_metodo_pago(token):
+    """Endpoint para eliminar un método de pago."""
+    try:
+        datos = request.json  # Recibir datos en JSON
+        cliente_id = datos.get('cliente_id')
+
+        servicio_metodo_pago = ServicioMetodoPago()
+        servicio_metodo_pago.eliminar_metodo_pago(cliente_id, token)
+
+        return Response(status=204)  # Devolver código HTTP 204 No Content
+    except ExcepcionDominio as e:
+        return Response(json.dumps({'error': str(e)}), status=400, mimetype='application/json')

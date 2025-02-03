@@ -42,9 +42,9 @@ class TipoMetodoPago(Enum):
 class MetodoPago(ObjetoValor):
     tipo: TipoMetodoPago
     nombre: str
-    token: field(default_factory=lambda: str(uuid4()))
-    datos_ofuscados: str
-    fecha_registro: datetime
+    token: str = field(default_factory=lambda: str(uuid4()))
+    datos_ofuscados: str = field(default="")
+    fecha_registro: datetime = field(default_factory=datetime.utcnow)
 
     def es_tipo(self, tipo: TipoMetodoPago) -> bool:
         """Valida si el método de pago es de un tipo específico."""
